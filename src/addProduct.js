@@ -1,44 +1,42 @@
-// @ts-check
-import crypto from "crypto";
-import AWS from "aws-sdk";
+const crypto = require('crypto');
+const AWS = require('aws-sdk');
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-/**
- * 
- * @param {*} event 
- * @returns 
- */
-const addProduct = async (event) => {
-    const { body } = event;
-    const { name, price, stock } = JSON.parse(body);
-    
+module.exports.addProduct = async (event) => {
+  const { body } = event;
+  const { name, price, stock } = JSON.parse(body); // Parsear el cuerpo de la solicitud
 
-    const newProduct = {
-        id: crypto.randomUUID(),
-        name: name,
-        price: price,
-        stock: stock
+  const newProduct = {
+    id: crypto.randomUUID(), // Genera un nuevo ID único
+    name: name,
+    price: price,
+    stock: stock,
+  };
+
+  const params = {
+    TableName: "ProductsDynamoDbTable",
+    Item: newProduct, // El nuevo producto a agregar
+  };
+  
+  try {
+    await dynamoDb.put(params).promise(); // Guardar el nuevo producto en DynamoDB
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        success: true,
+        message: 'Producto agregado exitosamente',
+        data: newProduct, // Devuelve el producto agregado
+      }),
     };
-
-
-    const params = {
-        TableName: "ProductsDynamoDbTable",
-        Item: newProduct 
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        success: false,
+        message: 'Error al agregar el producto',
+        error: error.message,
+      }),
     };
-    
-    try {
-        const data = await dynamoDb.put(params).promise();
-        return {
-            statusCode: 200,
-            body: JSON.stringify(data)
-        };
-    } catch (error) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify(error)
-        };
-    }
-}  
-
-module.exports = { addProduct };
+  }
+};

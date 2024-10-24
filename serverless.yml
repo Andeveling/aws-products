@@ -24,19 +24,54 @@ provider:
   
 
 functions:
+  # Endpoint para un saludo
   hello:
     handler: src/hello.hello
     events:
       - httpApi:
           path: /
           method: get
-  
+
+  # Crear un nuevo producto
   addProduct:
     handler: src/addProduct.addProduct
     events:
       - httpApi:
           path: /products
           method: post
+  
+  # Obtener lista de todos los productos
+  getProducts:
+    handler: src/getProducts.getProducts
+    events:
+      - httpApi:
+          path: /products
+          method: get
+  
+  # Obtener un producto por ID
+  getProductById:
+    handler: src/getProductById.getProductById
+    events:
+      - httpApi:
+          path: /products/{id}
+          method: get
+
+  # Actualizar un producto por ID
+  updateProduct:
+    handler: src/updateProduct.updateProduct
+    events:
+      - httpApi:
+          path: /products/{id}
+          method: put
+
+  # Eliminar un producto por ID
+  deleteProduct:
+    handler: src/deleteProduct.deleteProduct
+    events:
+      - httpApi:
+          path: /products/{id}
+          method: delete
+
 
 
 resources:
